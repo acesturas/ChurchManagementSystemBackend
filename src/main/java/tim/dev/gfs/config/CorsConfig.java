@@ -37,7 +37,8 @@ public class CorsConfig {
          * coming from Angular.
          */
         config.setAllowedOrigins(List.of(
-                "http://localhost:4200"
+                "http://localhost:4200",
+        	    "https://church-management-system-ruby.vercel.app"
         ));
 
 
