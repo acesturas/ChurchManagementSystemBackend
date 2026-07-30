@@ -1,77 +1,45 @@
 package tim.dev.gfs.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import static tim.dev.gfs.google.constant.GoogleSheetsConstants.ACTION_CREATE;
+import static tim.dev.gfs.google.constant.GoogleSheetsConstants.MODULE_EVENT;
 
-import javax.sql.DataSource;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Repository;
 
-import tim.dev.gfs.model.Events;
+import tim.dev.gfs.dto.EventResponse;
+import tim.dev.gfs.dto.GoogleSheetRequest;
+import tim.dev.gfs.google.client.GoogleSheetsClient;
+import tim.dev.gfs.model.Event;
 
 @Repository
 public class EventsDao {
 
-    private final DataSource dataSource;
+    private final GoogleSheetsClient googleSheetsClient;
 
-    public EventsDao(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public EventsDao(GoogleSheetsClient googleSheetsClient) {
+        this.googleSheetsClient = googleSheetsClient;
     }
 
-    public List<Events> getAllEvents() {
+    public EventResponse addEvent(Event event) {
 
-        List<Events> events = new ArrayList<>();
+    	//si backend ngayon ang magrerequest sa google API, isesend nya yung mga data na iadd as events
+        GoogleSheetRequest<Event> request = new GoogleSheetRequest<>();
 
-        String sql = """
-                SELECT id,
-                       event_name,
-                       description,
-                       event_start_date,
-                       event_end_date,
-                       start_time,
-                       end_time,
-                       location
-                FROM events
-                ORDER BY event_start_date ASC, start_time ASC
-                """;
+        request.setModule(MODULE_EVENT);
+        request.setAction(ACTION_CREATE);
 
-        try (
-            Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()
-        ) {
+        event.setCreatedOn(Timestamp.valueOf(LocalDateTime.now()));
+        event.setUpdatedOn(null);
+        event.setUpdatedBy("");
 
-            while (rs.next()) {
+        request.setData(event);
 
-                Events e = new Events();
-
-                e.setId(rs.getString("id"));
-                e.setEventName(rs.getString("event_name"));
-                e.setDescription(rs.getString("description"));
-                e.setLocation(rs.getString("location"));
-
-                if (rs.getDate("event_start_date") != null)
-                    e.setEventStartDate(rs.getDate("event_start_date").toLocalDate());
-
-                if (rs.getDate("event_end_date") != null)
-                    e.setEventEndDate(rs.getDate("event_end_date").toLocalDate());
-
-                if (rs.getTime("start_time") != null)
-                    e.setStartTime(rs.getTime("start_time").toLocalTime());
-
-                if (rs.getTime("end_time") != null)
-                    e.setEndTime(rs.getTime("end_time").toLocalTime());
-
-                events.add(e);
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve events", e);
-        }
-
-        return events;
+        return googleSheetsClient.post(
+                request,
+                EventResponse.class
+        );
     }
+
 }

@@ -1,11 +1,10 @@
 package tim.dev.gfs.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import tim.dev.gfs.dao.EventsDao;
-import tim.dev.gfs.model.Events;
+import tim.dev.gfs.dto.EventResponse;
+import tim.dev.gfs.model.Event;
 
 @Service
 public class EventsService {
@@ -16,8 +15,8 @@ public class EventsService {
         this.eventsDao = eventsDao;
     }
 
-    public List<Events> getAllEvents() {
-        return eventsDao.getAllEvents();
+    public EventResponse addEvent(Event event) {
+        return eventsDao.addEvent(event);
     }
 
 }

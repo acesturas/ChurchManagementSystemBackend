@@ -1,12 +1,12 @@
 package tim.dev.gfs.controller;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import tim.dev.gfs.model.Events;
+import tim.dev.gfs.dto.EventResponse;
+import tim.dev.gfs.model.Event;
 import tim.dev.gfs.service.EventsService;
 
 @RestController
@@ -18,8 +18,8 @@ public class EventsController {
 		this.eventsService = eventsService;
 	}
 	
-	@GetMapping("/getAllEvents")
-	public List<Events> getAllEvents(){
-		return eventsService.getAllEvents();
+	@PostMapping("/addEvent")
+	public EventResponse addEvent(@RequestBody Event event){
+		return eventsService.addEvent(event);
 	}
 }
