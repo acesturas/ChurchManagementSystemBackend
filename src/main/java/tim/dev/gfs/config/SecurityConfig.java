@@ -70,6 +70,17 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
+            
+            .exceptionHandling(exception -> exception
+            	    .authenticationEntryPoint((request, response, authException) -> {
+            	        System.out.println("Authentication failed: " + authException.getMessage());
+            	        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            	    })
+            	    .accessDeniedHandler((request, response, accessDeniedException) -> {
+            	        System.out.println("Access denied: " + accessDeniedException.getMessage());
+            	        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            	    })
+            	)
 
             .logout(logout -> logout
                 .logoutUrl("/api/auth/logout")
