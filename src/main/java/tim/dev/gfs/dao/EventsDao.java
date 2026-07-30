@@ -36,10 +36,15 @@ public class EventsDao {
 
         request.setData(event);
 
-        return googleSheetsClient.post(
-                request,
-                EventResponse.class
-        );
+//        return googleSheetsClient.post(
+//                request,
+//                EventResponse.class
+//        );
+        String response = googleSheetsClient.post(request);
+
+        System.out.println(response);
+
+        return new EventResponse();
     }
 
 }

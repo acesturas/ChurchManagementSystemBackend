@@ -14,14 +14,22 @@ public class GoogleSheetsClient {
     @Value("${google.sheets.url}")
     private String scriptUrl;
 
-    public <ResponseType, RequestData> ResponseType post(GoogleSheetRequest<RequestData> request, Class<ResponseType> responseType) {
+//    public <ResponseType, RequestData> ResponseType post(GoogleSheetRequest<RequestData> request, Class<ResponseType> responseType) {
+//
+//        return restTemplate.postForObject(
+//                scriptUrl,
+//                request,
+//                responseType
+//        );
+//
+//    }
+    public String post(GoogleSheetRequest<?> request) {
 
         return restTemplate.postForObject(
-                scriptUrl,
+        		scriptUrl,
                 request,
-                responseType
+                String.class
         );
-
     }
 
 

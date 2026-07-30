@@ -4,6 +4,8 @@ public class EventResponse {
 	private boolean success;
 	private String message;
 	
+	public EventResponse() {}
+	
 	public EventResponse(boolean success, String message) {
 		this.success = success;
 		this.message = message;
