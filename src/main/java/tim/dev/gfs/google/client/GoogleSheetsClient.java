@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import jakarta.annotation.PostConstruct;
+import tim.dev.gfs.dto.EventResponse;
 import tim.dev.gfs.dto.GoogleSheetRequest;
 
 @Component
@@ -28,12 +29,12 @@ public class GoogleSheetsClient {
 //        );
 //
 //    }
-    public String post(GoogleSheetRequest<?> request) {
+    public EventResponse post(GoogleSheetRequest<?> request) {
 
         return restTemplate.postForObject(
         		scriptUrl,
                 request,
-                String.class
+                EventResponse .class
         );
     }
 

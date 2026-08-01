@@ -40,11 +40,9 @@ public class EventsDao {
 //                request,
 //                EventResponse.class
 //        );
-        String response = googleSheetsClient.post(request);
 
-        System.out.println(response);
 
-        return new EventResponse();
+        return googleSheetsClient.post(request);
     }
 
 }
