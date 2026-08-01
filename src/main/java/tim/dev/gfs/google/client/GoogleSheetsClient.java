@@ -1,11 +1,11 @@
 package tim.dev.gfs.google.client;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import jakarta.annotation.PostConstruct;
-import tim.dev.gfs.dto.EventResponse;
 import tim.dev.gfs.dto.GoogleSheetRequest;
 
 @Component
@@ -16,26 +16,19 @@ public class GoogleSheetsClient {
     @Value("${google.sheets.url}")
     private String scriptUrl;
 
-    @PostConstruct
-    public void init() {
-        System.out.println("Google Script URL: " + scriptUrl);
-    }
-//    public <ResponseType, RequestData> ResponseType post(GoogleSheetRequest<RequestData> request, Class<ResponseType> responseType) {
-//
-//        return restTemplate.postForObject(
-//                scriptUrl,
-//                request,
-//                responseType
-//        );
-//
-//    }
-    public EventResponse post(GoogleSheetRequest<?> request) {
+    public ResponseEntity<String> post(GoogleSheetRequest<?> request) {
 
-        return restTemplate.postForObject(
-        		scriptUrl,
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                scriptUrl,
                 request,
-                EventResponse .class
+                String.class
         );
+
+        System.out.println("Status : " + response.getStatusCode());
+        System.out.println("Headers: " + response.getHeaders());
+        System.out.println("Body   : " + response.getBody());
+
+        return response;
     }
 
 

@@ -22,6 +22,7 @@ public class UserDao {
 
     public User findByUsername(String username) {
 
+    	System.out.println("Inside UserDao findByUsername()");
         String sql = """
         		SELECT id,
 				       username,
@@ -66,6 +67,7 @@ public class UserDao {
     }
     
     public boolean existsByUsername(String username) {
+    	System.out.println("Inside UserDao existsByUsername()");
 
         String sql = "SELECT 1 FROM users WHERE username = ?";
 
@@ -84,6 +86,7 @@ public class UserDao {
     }
     
     public void insertUser(User user) {
+    	System.out.println("Inside UserDao insertUser()");
 
         String sql = """
             INSERT INTO users

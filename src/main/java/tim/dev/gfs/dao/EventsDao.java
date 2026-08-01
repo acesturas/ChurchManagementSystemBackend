@@ -6,9 +6,9 @@ import static tim.dev.gfs.google.constant.GoogleSheetsConstants.MODULE_EVENT;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
-import tim.dev.gfs.dto.EventResponse;
 import tim.dev.gfs.dto.GoogleSheetRequest;
 import tim.dev.gfs.google.client.GoogleSheetsClient;
 import tim.dev.gfs.model.Event;
@@ -22,7 +22,8 @@ public class EventsDao {
         this.googleSheetsClient = googleSheetsClient;
     }
 
-    public EventResponse addEvent(Event event) {
+    public ResponseEntity<String> addEvent(Event event) {
+    	System.out.println("Inside EventsDao addEvent()");
 
     	//si backend ngayon ang magrerequest sa google API, isesend nya yung mga data na iadd as events
         GoogleSheetRequest<Event> request = new GoogleSheetRequest<>();
@@ -40,9 +41,13 @@ public class EventsDao {
 //                request,
 //                EventResponse.class
 //        );
+        
+        ResponseEntity<String> aaa = googleSheetsClient.post(request);
+        
+        System.out.println("aaa: " + aaa.getBody());
 
 
-        return googleSheetsClient.post(request);
+        return aaa;
     }
 
 }

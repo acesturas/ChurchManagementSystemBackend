@@ -45,6 +45,8 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
+
+    	System.out.println("Inside AuthService login()");
         try {
 
             /*
@@ -117,6 +119,7 @@ public class AuthService {
 
     public LoginResponse register(RegisterRequest request) {
 
+    	System.out.println("Inside AuthService register()");
         /*
          * Prevent duplicate usernames.
          */

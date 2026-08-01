@@ -22,11 +22,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
+    	System.out.println("Inside controller login()");
         return authService.login(request);
     }
     
     @PostMapping("/register")
     public LoginResponse register(@RequestBody RegisterRequest request) {
+    	System.out.println("Inside controller register()");
         return authService.register(request);
     }
 }

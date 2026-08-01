@@ -1,11 +1,11 @@
 package tim.dev.gfs.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import tim.dev.gfs.dto.EventResponse;
 import tim.dev.gfs.model.Event;
 import tim.dev.gfs.service.EventsService;
 
@@ -19,7 +19,8 @@ public class EventsController {
 	}
 	
 	@PostMapping("/addEvent")
-	public EventResponse addEvent(@RequestBody Event event){
+	public ResponseEntity<String> addEvent(@RequestBody Event event){
+    	System.out.println("Inside EventsController addEvent()");
 		return eventsService.addEvent(event);
 	}
 }
