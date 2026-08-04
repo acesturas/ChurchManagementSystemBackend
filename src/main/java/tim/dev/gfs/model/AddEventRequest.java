@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class Event {
+public class AddEventRequest {
 
     private String eventId;
     private String eventName;
@@ -19,27 +19,6 @@ public class Event {
     private String createdBy;
     private Timestamp updatedOn;
     private String updatedBy;
-	
-	public Event() {}
-
-	public Event(String eventId, String eventName, String eventDescription, LocalDate startDate, LocalDate endDate,
-			LocalTime startTime, LocalTime endTime, String eventLocation, String eventStatus, Timestamp createdOn,
-			String createdBy, Timestamp updatedOn, String updatedBy) {
-		super();
-		this.eventId = eventId;
-		this.eventName = eventName;
-		this.eventDescription = eventDescription;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.eventLocation = eventLocation;
-		this.eventStatus = eventStatus;
-		this.createdOn = createdOn;
-		this.createdBy = createdBy;
-		this.updatedOn = updatedOn;
-		this.updatedBy = updatedBy;
-	}
 
 	public String getEventId() {
 		return eventId;

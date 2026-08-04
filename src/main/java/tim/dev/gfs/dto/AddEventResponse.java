@@ -1,12 +1,12 @@
 package tim.dev.gfs.dto;
 
-public class EventResponse {
+public class AddEventResponse {
 	private boolean success;
 	private String message;
 	
-	public EventResponse() {}
+	public AddEventResponse() {}
 	
-	public EventResponse(boolean success, String message) {
+	public AddEventResponse(boolean success, String message) {
 		this.success = success;
 		this.message = message;
 	}

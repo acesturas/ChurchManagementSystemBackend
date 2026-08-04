@@ -1,10 +1,9 @@
 package tim.dev.gfs.service;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import tim.dev.gfs.dao.EventsDao;
-import tim.dev.gfs.model.Event;
+import tim.dev.gfs.model.AddEventRequest;
 
 @Service
 public class EventsService {
@@ -15,7 +14,7 @@ public class EventsService {
         this.eventsDao = eventsDao;
     }
 
-    public ResponseEntity<String> addEvent(Event event) {
+    public String addEvent(AddEventRequest event) {
     	System.out.println("Inside EventsService addEvent()");
         return eventsDao.addEvent(event);
     }
