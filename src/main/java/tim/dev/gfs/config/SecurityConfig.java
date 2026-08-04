@@ -90,7 +90,11 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .logoutSuccessHandler((request, response, authentication) -> {
                     response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().write("Logout successful");
+                    response.getWriter().write("""
+                            {
+	                            "message": "Logout successful"
+	                        }
+                    """);
                 })
             );
 

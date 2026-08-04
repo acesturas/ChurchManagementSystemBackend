@@ -93,7 +93,7 @@ public class AuthService {
             return new LoginResponse(
                     true,
                     "Login successful.",
-                    token);
+                    token, user.getUser());
 
         } catch (AuthenticationException ex) {
 
@@ -113,7 +113,7 @@ public class AuthService {
             return new LoginResponse(
                     false,
                     "Invalid username or password.",
-                    null);
+                    null, null);
         }
     }
 
@@ -128,7 +128,7 @@ public class AuthService {
             return new LoginResponse(
                     false,
                     "Username already exists.",
-                    null);
+                    null, null);
         }
 
         User user = new User();
@@ -160,6 +160,6 @@ public class AuthService {
         return new LoginResponse(
                 true,
                 "Registration successful.",
-                null);
+                null, null);
     }
 }

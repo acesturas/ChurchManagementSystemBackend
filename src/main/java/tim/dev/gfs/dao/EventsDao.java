@@ -1,13 +1,21 @@
 package tim.dev.gfs.dao;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import tim.dev.gfs.dto.AddEventRequest;
+import tim.dev.gfs.dto.LastEventIdResponse;
 import tim.dev.gfs.google.client.GoogleSheetsClient;
-import tim.dev.gfs.model.AddEventRequest;
+import tim.dev.gfs.model.Event;
 import tim.dev.gfs.utils.StaticUtils;
 
 @Repository
@@ -31,20 +39,21 @@ public class EventsDao {
     public String getLastEventId() {
 
         try {
-			return googleSheetsClient.post(
-			        "EVENT",
-			        "GET_LAST_EVENT_ID",
-			        null,
-			        String.class
-			);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        return null;
+
+            LastEventIdResponse response =
+                    googleSheetsClient.post(
+                            "EVENT",
+                            "GET_LAST_EVENT_ID",
+                            null,
+                            LastEventIdResponse.class);
+
+            return response.getEventId();
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
     /**
@@ -56,11 +65,16 @@ public class EventsDao {
     public String addEvent(AddEventRequest event) {
 
         System.out.println("Inside EventsDao.addEvent()");
+        
+
+        int nextSequence = StaticUtils.getNextSequence(getLastEventId());
+        System.out.println("\ngetLastEventId():" + getLastEventId());
+        System.out.println("\nnextSequence:" + nextSequence);
 
         // TODO:
         // Replace 0 with the actual next sequence once
         // getLastEventId() and getNextSequence() are connected.
-        event.setEventId(StaticUtils.generateId("EV", "PC", 0));
+        event.setEventId(StaticUtils.generateId("EV", "PC", nextSequence));
 
         event.setCreatedOn(Timestamp.valueOf(LocalDateTime.now()));
         event.setUpdatedOn(null);
@@ -74,6 +88,7 @@ public class EventsDao {
 			        event,
 			        String.class
 			);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -82,8 +97,36 @@ public class EventsDao {
 			e.printStackTrace();
 		}
 
-        System.out.println("Response: " + response);
-
         return response;
+    }
+    
+    public List<Event> getEvents() {
+
+        System.out.println("Inside EventsDao.getEvents()");
+
+        try {
+
+            String response = googleSheetsClient.post(
+                    "EVENT",
+                    "READ",
+                    null,
+                    String.class
+            );
+
+            System.out.println("Read Events response: " + response);
+
+            Gson gson = StaticUtils.getGson();
+
+            Type listType = new TypeToken<List<Event>>() {}.getType();
+
+            return gson.fromJson(response, listType);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+
+        return new ArrayList<>();
     }
 }
