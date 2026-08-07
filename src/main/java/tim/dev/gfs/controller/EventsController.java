@@ -22,7 +22,7 @@ public class EventsController {
 	}
 	
 	@PostMapping("/addEvent")
-	public String addEvent(@RequestBody AddEventRequest event){
+	public boolean addEvent(@RequestBody AddEventRequest event){
     	System.out.println("Inside EventsController addEvent()");
 		return eventsService.addEvent(event);
 	}

@@ -1,16 +1,19 @@
 package tim.dev.gfs.dao;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Repository;
+import javax.sql.DataSource;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import org.springframework.stereotype.Repository;
 
 import tim.dev.gfs.dto.AddEventRequest;
 import tim.dev.gfs.dto.LastEventIdResponse;
@@ -21,11 +24,14 @@ import tim.dev.gfs.utils.StaticUtils;
 @Repository
 public class EventsDao {
 
+    private final DataSource dataSource;
+
     // Client responsible for communicating with Google Apps Script
     private final GoogleSheetsClient googleSheetsClient;
 
-    public EventsDao(GoogleSheetsClient googleSheetsClient) {
-        this.googleSheetsClient = googleSheetsClient;
+    public EventsDao(DataSource dataSource, GoogleSheetsClient client) {
+        this.dataSource = dataSource;
+		this.googleSheetsClient = client;
     }
 
     /**
@@ -62,64 +68,129 @@ public class EventsDao {
      * Before sending, the backend generates the Event ID and sets
      * the audit fields such as createdOn, updatedOn, and updatedBy.
      */
-    public String addEvent(AddEventRequest event) {
+//    public String addEvent(AddEventRequest event) {
+//
+//        System.out.println("Inside EventsDao.addEvent()");
+//        
+//
+//        int nextSequence = StaticUtils.getNextSequence(getLastEventId());
+//        System.out.println("\ngetLastEventId():" + getLastEventId());
+//        System.out.println("\nnextSequence:" + nextSequence);
+//
+//        // TODO:
+//        // Replace 0 with the actual next sequence once
+//        // getLastEventId() and getNextSequence() are connected.
+//        event.setEventId(StaticUtils.generateId("EV", "PC", nextSequence));
+//
+//        event.setCreatedOn(Timestamp.valueOf(LocalDateTime.now()));
+//        event.setUpdatedOn(null);
+//        event.setUpdatedBy("");
+//
+//        String response = null;
+//		try {
+//			response = googleSheetsClient.post(
+//			        "EVENT",
+//			        "CREATE",
+//			        event,
+//			        String.class
+//			);
+//			
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//        return response;
+//    }
+    
+
+	public boolean addEvent(AddEventRequest event) {
 
         System.out.println("Inside EventsDao.addEvent()");
         
-
-        int nextSequence = StaticUtils.getNextSequence(getLastEventId());
-        System.out.println("\ngetLastEventId():" + getLastEventId());
-        System.out.println("\nnextSequence:" + nextSequence);
-
-        // TODO:
-        // Replace 0 with the actual next sequence once
-        // getLastEventId() and getNextSequence() are connected.
-        event.setEventId(StaticUtils.generateId("EV", "PC", nextSequence));
-
-        event.setCreatedOn(Timestamp.valueOf(LocalDateTime.now()));
-        event.setUpdatedOn(null);
-        event.setUpdatedBy("");
-
-        String response = null;
-		try {
-			response = googleSheetsClient.post(
-			        "EVENT",
-			        "CREATE",
-			        event,
-			        String.class
-			);
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        String sql = """
+        		INSERT INTO events(id, event_name, description, event_start_date, event_end_date, start_time, end_time, location, created_by)
+        		VALUES
+        		(?, ?, ?, ?, ?, ?, ?, ?, ?)
+        		""";
+        
+        try(Connection conn = dataSource.getConnection();
+        		PreparedStatement ps = conn.prepareStatement(sql)){
+        	
+        	ps.setString(1, sql);
+        	
+        	int inserted = ps.executeUpdate();
+        	
+        	if(inserted > 0) {
+        		return true;
+        	}
+        	return false;
+        	
+        	
+        } catch (Exception e) {
+			// TODO: handle exception
+        	e.printStackTrace();
+        	return false;
 		}
-
-        return response;
-    }
+	}
     
     public List<Event> getEvents() {
 
         System.out.println("Inside EventsDao.getEvents()");
+        
+        List<Event> eventList = new ArrayList<Event>();
+        
+        String sql = """
+        		SELECT *
+        		  FROM events
+        		""";
 
-        try {
+        try(Connection conn = dataSource.getConnection();
+        		PreparedStatement ps = conn.prepareStatement(sql);
+        		ResultSet rs = ps.executeQuery()) {
 
-            String response = googleSheetsClient.post(
-                    "EVENT",
-                    "READ",
-                    null,
-                    String.class
-            );
+        	while(rs.next()) {
+        		System.out.println("Events table has records");
+        		Event e = new Event();
+        		e.setEventId(rs.getString("id"));
+        		e.setEventName(rs.getString("event_name"));
+        		e.setEventDescription(rs.getString("description"));
+        		
+        		Date startDate = rs.getDate("event_start_date");
+        		if (startDate != null) {
+            		e.setStartDate(startDate.toLocalDate());
+        		}
 
-            System.out.println("Read Events response: " + response);
-
-            Gson gson = StaticUtils.getGson();
-
-            Type listType = new TypeToken<List<Event>>() {}.getType();
-
-            return gson.fromJson(response, listType);
+        		Date endDate = rs.getDate("event_end_date");
+        		if(endDate != null) {
+            		e.setEndDate(endDate.toLocalDate());
+        		}
+        		
+        		Time startTime = rs.getTime("start_time");
+        		if(startTime != null) {
+            		e.setStartTime(startTime.toLocalTime());
+        		}
+        		
+        		Time endTime = rs.getTime("end_time");
+        		if(endTime != null) {
+            		e.setEndTime(endTime.toLocalTime());
+        		}
+        		
+        		e.setEventLocation(rs.getString("location"));
+        		e.setCreatedBy(rs.getString("created_by"));
+        		
+        		Timestamp createdOn = rs.getTimestamp("created_at");
+        		if(createdOn != null) {
+            		e.setCreatedOn(createdOn);
+        		}
+        		
+        		eventList.add(e);
+        	}
+        	
+        	return eventList;
 
         } catch (Exception e) {
 

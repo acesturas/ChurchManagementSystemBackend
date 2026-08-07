@@ -3,6 +3,7 @@ package tim.dev.gfs.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import tim.dev.gfs.dao.EventsDao;
 import tim.dev.gfs.dto.AddEventRequest;
@@ -17,14 +18,19 @@ public class EventsService {
         this.eventsDao = eventsDao;
     }
 
-    public String addEvent(AddEventRequest event) {
+    public boolean addEvent(AddEventRequest event) {
     	System.out.println("Inside EventsService addEvent()");
         return eventsDao.addEvent(event);
     }
     
+    @Transactional
     public List<Event> getEvents() {
     	System.out.println("Inside EventsService readEvents()");
-        return eventsDao.getEvents();
+    	try{
+            return eventsDao.getEvents();
+    	} catch (Exception e) {
+    		return null;
+		}
     }
 
 }
