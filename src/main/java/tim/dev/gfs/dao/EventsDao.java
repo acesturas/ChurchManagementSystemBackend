@@ -112,7 +112,50 @@ public class EventsDao {
 //    }
     
     
-    
+    public AddEventResponse updateEvent(AddEventRequest event){
+
+        System.out.println("Inside EventsDao.addEvent()");
+        
+        String sql = """
+        		UPDATE events
+        		   SET event_name = ?,
+        			   description = ?, 
+        			   event_start_date = ?, 
+        			   event_end_date = ?, 
+        			   start_time = ?, 
+        			   end_time = ?, 
+        			   location = ?, 
+        			   updted_by = ?
+        		 WHERE id = ?
+        		""";
+        
+        try(Connection conn = dataSource.getConnection();
+        		PreparedStatement ps = conn.prepareStatement(sql)){
+
+        	ps.setString(1, event.getEventName());
+        	ps.setString(2, event.getEventDescription());
+        	ps.setDate(3, Date.valueOf(event.getStartDate()));
+        	ps.setDate(4, Date.valueOf(event.getEndDate()));
+        	ps.setTime(5, Time.valueOf(event.getStartTime()));
+        	ps.setTime(6, Time.valueOf(event.getEndTime()));
+        	ps.setString(7, event.getEventLocation());
+        	ps.setString(8, event.getCreatedBy());
+        	ps.setString(9, event.getEventId());
+        	
+        	int updated = ps.executeUpdate();
+
+        	if(updated > 0) {
+        		return new AddEventResponse(true, "Event Successfully Updated!");
+        	}
+    		return new AddEventResponse(false, "Error! Updating Failed.");
+        	
+        } catch (Exception e) {
+			// TODO: handle exception
+        	e.printStackTrace();
+    		return new AddEventResponse(false, "Error! Updating Failed.");
+		}
+        		
+    }
 
 	public AddEventResponse addEvent(AddEventRequest event) {
 
@@ -120,7 +163,8 @@ public class EventsDao {
         
         String sql = """
         		INSERT INTO events(
-        			id, event_name, 
+        			id, 
+        			event_name, 
         			description, 
         			event_start_date, 
         			event_end_date, 

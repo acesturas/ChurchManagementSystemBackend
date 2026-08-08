@@ -19,10 +19,19 @@ public class EventsService {
         this.eventsDao = eventsDao;
     }
 
+    @Transactional
     public AddEventResponse addEvent(AddEventRequest event) {
     	System.out.println("Inside EventsService addEvent()");
         return eventsDao.addEvent(event);
     }
+
+    @Transactional
+    public AddEventResponse updateEvent(AddEventRequest event) {
+    	System.out.println("Inside EventsService addEvent()");
+        return eventsDao.updateEvent(event);
+    }
+    
+    
     
     @Transactional
     public List<Event> getEvents() {
