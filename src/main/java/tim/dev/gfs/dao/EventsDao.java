@@ -1,13 +1,11 @@
 package tim.dev.gfs.dao;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +14,10 @@ import javax.sql.DataSource;
 import org.springframework.stereotype.Repository;
 
 import tim.dev.gfs.dto.AddEventRequest;
-import tim.dev.gfs.dto.LastEventIdResponse;
+import tim.dev.gfs.dto.AddEventResponse;
 import tim.dev.gfs.google.client.GoogleSheetsClient;
 import tim.dev.gfs.model.Event;
-import tim.dev.gfs.utils.StaticUtils;
+import tim.dev.gfs.utils.TransactionIdGenerator;
 
 @Repository
 public class EventsDao {
@@ -27,11 +25,18 @@ public class EventsDao {
     private final DataSource dataSource;
 
     // Client responsible for communicating with Google Apps Script
-    private final GoogleSheetsClient googleSheetsClient;
+//    private final GoogleSheetsClient googleSheetsClient;
+    private final TransactionIdGenerator idGenerator;
 
-    public EventsDao(DataSource dataSource, GoogleSheetsClient client) {
+    public EventsDao(
+    		DataSource dataSource, 
+    		GoogleSheetsClient client, 
+            TransactionIdGenerator idGenerator) {
+    	
         this.dataSource = dataSource;
-		this.googleSheetsClient = client;
+//		this.googleSheetsClient = client;
+        this.idGenerator = idGenerator;
+        
     }
 
     /**
@@ -42,25 +47,25 @@ public class EventsDao {
      *
      * This method simply forwards the request and returns the result.
      */
-    public String getLastEventId() {
-
-        try {
-
-            LastEventIdResponse response =
-                    googleSheetsClient.post(
-                            "EVENT",
-                            "GET_LAST_EVENT_ID",
-                            null,
-                            LastEventIdResponse.class);
-
-            return response.getEventId();
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return "";
-    }
+//    public String getLastEventId() {
+//
+//        try {
+//
+//            LastEventIdResponse response =
+//                    googleSheetsClient.post(
+//                            "EVENT",
+//                            "GET_LAST_EVENT_ID",
+//                            null,
+//                            LastEventIdResponse.class);
+//
+//            return response.getEventId();
+//
+//        } catch (IOException | InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return "";
+//    }
 
     /**
      * Sends a new event to Google Apps Script for insertion.
@@ -106,13 +111,23 @@ public class EventsDao {
 //        return response;
 //    }
     
+    
+    
 
-	public boolean addEvent(AddEventRequest event) {
+	public AddEventResponse addEvent(AddEventRequest event) {
 
         System.out.println("Inside EventsDao.addEvent()");
         
         String sql = """
-        		INSERT INTO events(id, event_name, description, event_start_date, event_end_date, start_time, end_time, location, created_by)
+        		INSERT INTO events(
+        			id, event_name, 
+        			description, 
+        			event_start_date, 
+        			event_end_date, 
+        			start_time, 
+        			end_time, 
+        			location, 
+        			created_by)
         		VALUES
         		(?, ?, ?, ?, ?, ?, ?, ?, ?)
         		""";
@@ -120,20 +135,30 @@ public class EventsDao {
         try(Connection conn = dataSource.getConnection();
         		PreparedStatement ps = conn.prepareStatement(sql)){
         	
-        	ps.setString(1, sql);
+        	event.setEventId(idGenerator.generateId("events", "EV", "PC"));
+        	
+        	ps.setString(1, event.getEventId());
+        	ps.setString(2, event.getEventName());
+        	ps.setString(3, event.getEventDescription());
+        	ps.setDate(4, Date.valueOf(event.getStartDate()));
+        	ps.setDate(5, Date.valueOf(event.getEndDate()));
+        	ps.setTime(6, Time.valueOf(event.getStartTime()));
+        	ps.setTime(7, Time.valueOf(event.getEndTime()));
+        	ps.setString(8, event.getEventLocation());
+        	ps.setString(9, event.getCreatedBy());
         	
         	int inserted = ps.executeUpdate();
         	
         	if(inserted > 0) {
-        		return true;
+        		return new AddEventResponse(true, "Event Successfully Saved!");
         	}
-        	return false;
+    		return new AddEventResponse(false, "Error! Saving Failed.");
         	
         	
         } catch (Exception e) {
 			// TODO: handle exception
         	e.printStackTrace();
-        	return false;
+    		return new AddEventResponse(false, "Error! Saving Failed.");
 		}
 	}
     

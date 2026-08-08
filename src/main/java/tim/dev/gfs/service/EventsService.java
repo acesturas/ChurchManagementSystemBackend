@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tim.dev.gfs.dao.EventsDao;
 import tim.dev.gfs.dto.AddEventRequest;
+import tim.dev.gfs.dto.AddEventResponse;
 import tim.dev.gfs.model.Event;
 
 @Service
@@ -18,7 +19,7 @@ public class EventsService {
         this.eventsDao = eventsDao;
     }
 
-    public boolean addEvent(AddEventRequest event) {
+    public AddEventResponse addEvent(AddEventRequest event) {
     	System.out.println("Inside EventsService addEvent()");
         return eventsDao.addEvent(event);
     }

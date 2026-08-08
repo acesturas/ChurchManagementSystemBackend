@@ -1,45 +1,26 @@
 package tim.dev.gfs.google.client;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalTime;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
-
-import tim.dev.gfs.dto.GoogleSheetRequest;
-import tim.dev.gfs.utils.StaticUtils;
 
 @Component
 public class GoogleSheetsClient {
 
     // Java's modern HTTP client
-    private final HttpClient httpClient;
+//    private final HttpClient httpClient;
 
     // Gson instance used to serialize/deserialize JSON
-    private final Gson gson;
+//    private final Gson gson;
 
     // Google Apps Script Web App URL
-    @Value("${google.sheets.url}")
-    private String scriptUrl;
-
-    public GoogleSheetsClient() {
+//    @Value("${google.sheets.url}")
+//    private String scriptUrl;
+//
+//    public GoogleSheetsClient() {
 
         // Configure HttpClient
-        this.httpClient = HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .build();
+//        this.httpClient = HttpClient.newBuilder()
+//                .followRedirects(HttpClient.Redirect.NORMAL)
+//                .build();
 
         /*
          * Configure Gson.
@@ -51,8 +32,8 @@ public class GoogleSheetsClient {
          * LocalDate and Timestamp.
          */
 
-        this.gson = StaticUtils.getGson();
-    }
+//        this.gson = TransactionIdGenerator.getGson();
+//    }
 
     /**
      * Sends a POST request to Google Apps Script.
@@ -63,6 +44,7 @@ public class GoogleSheetsClient {
      * @param responseType Expected response type
      * @return Parsed response
      */
+/*
     public <T, R> R post(
             String module,
             String action,
@@ -114,5 +96,5 @@ public class GoogleSheetsClient {
         return gson.fromJson(response.body(), responseType);
     }
     
-    
+    */
 }
