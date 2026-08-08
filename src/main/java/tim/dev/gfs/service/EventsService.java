@@ -36,11 +36,7 @@ public class EventsService {
     @Transactional
     public List<Event> getEvents() {
     	System.out.println("Inside EventsService readEvents()");
-    	try{
-            return eventsDao.getEvents();
-    	} catch (Exception e) {
-    		return null;
-		}
+        return eventsDao.getEvents();
     }
 
 }

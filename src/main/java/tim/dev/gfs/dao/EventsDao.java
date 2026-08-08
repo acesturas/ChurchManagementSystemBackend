@@ -215,6 +215,7 @@ public class EventsDao {
         String sql = """
         		SELECT *
         		  FROM events
+        		 WHERE event_end_date >= current_date
         		""";
 
         try(Connection conn = dataSource.getConnection();
